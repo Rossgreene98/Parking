@@ -1,13 +1,14 @@
 from random import choice
+import matplotlib.pyplot as plt
 
 class SquareParkingLot:
-    def __init__(self, pointsPerSide, pointsPerCar):
-        self.pointsPerSide = pointsPerSide
+    def __init__(self, lengthOfSide, pointsPerCar):
+        self.pointsPerSide = lengthOfSide + 1  # because both ends are included as points
         self.pointsPerCar = pointsPerCar
         self.parkedCars = []
-        self.pointsCarCanPark = self.getEverywhereCanCanParkInitially()
+        self.pointsCarCanPark = self.getEverywhereCanParkInitially()
 
-    def getEverywhereCanCanParkInitially(self):
+    def getEverywhereCanParkInitially(self):
         allPlacesForNewCar = []
         for i in range(self.pointsPerSide - self.pointsPerCar):
             allPlacesForNewCar += [Point(i, j) for j in range(self.pointsPerSide - self.pointsPerCar)]
@@ -15,7 +16,7 @@ class SquareParkingLot:
 
     def generateNewCarThatCanPark(self):
         newCarLocation = choice(self.pointsCarCanPark)
-        return Car(newCarLocation)
+        return Car(newCarLocation, self.pointsPerCar)
 
     def parkNewCar(self, newCar):
         self.parkedCars.append(newCar)
@@ -25,20 +26,45 @@ class SquareParkingLot:
     def findNewUnavailableSpace(self, newCar):
         newCarLocation = newCar.bottomLeftPoint
         newUnavailableSpace = []
-        for i in range(newCarLocation.x - self.pointsPerCar, newCarLocation.x + self.pointsPerCar):
-            for j in range(newCarLocation.y - self.pointsPerCar, newCarLocation.x + self.pointsPerCar):
+        for i in range(newCarLocation.x - self.pointsPerCar, newCarLocation.x + self.pointsPerCar + 1):
+            for j in range(newCarLocation.y - self.pointsPerCar, newCarLocation.y + self.pointsPerCar + 1):
                 newUnavailableSpace.append(Point(i, j))
         return newUnavailableSpace
 
     def removeFromAvailableSpace(self, newUnavailableSpace):
-        filter(lambda point: not point.inSetOfPoint(newUnavailableSpace), self.pointsCarCanPark)
+        self.pointsCarCanPark = list(
+            filter(lambda point: not point.isInSetOfPoints(newUnavailableSpace), self.pointsCarCanPark)
+        )
 
-    def display(self):
-        print(len(self.parkedCars))
+    def display(self, withImage=True):
+        print("Number of Squares: " + str(len(self.parkedCars)))
+        if withImage:
+            plt.axes()
+
+            axes = plt.gca()
+            axes.set_xlim([0, self.pointsPerSide])
+            axes.set_ylim([0, self.pointsPerSide])
+
+            for car in self.parkedCars:
+                car.displayOntoPlot()
+
+            plt.axis('scaled')
+            plt.show()
 
 class Car:
-    def __init__(self, bottomLeftPoint):
+    def __init__(self, bottomLeftPoint, pointsPerCar):
         self.bottomLeftPoint = bottomLeftPoint
+        self.pointsPerCar = pointsPerCar
+
+    def displayOntoPlot(self):
+        rectangle = plt.Rectangle(
+            (self.bottomLeftPoint.x, self.bottomLeftPoint.y),
+            self.pointsPerCar,
+            self.pointsPerCar,
+            fc='r'
+        )
+        plt.gca().add_patch(rectangle)
+
 
 class Point:
     def __init__(self, x, y):
@@ -57,7 +83,7 @@ def createParkingLotWithSize1Cars(sizeOfLot, meshSize=0.01):
 
 
 # Mesh Size is smallest possible distance separating parked cars. All cars placed on intersection of Mesh
-standardMeshSize = 0.01
+standardMeshSize = 0.1
 
 def run1SimulationWithLotSize(parkingLotSize):
     parkingLot = createParkingLotWithSize1Cars(parkingLotSize, standardMeshSize)
