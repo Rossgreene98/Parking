@@ -1,62 +1,106 @@
-from math import sqrt
-from random import uniform
+from random import choice, randint
+import matplotlib.pyplot as plt
 
-standardParkingLotSideLength = 100
-standardSphereRadius = 0.5
-consecutiveFailuresToDeclareJammed = 20
-
-class ParkingLot:
-    @staticmethod
-    def createStandardLot():
-        pass
-
-    def __init__(self, sizeOfLot):
+class TemplateParkingLot(object):
+    def __init__(self, lengthOfSide, pointsPerUnitLength, CarClass):
+        self.CarClass = CarClass
+        self.lengthOfSide = lengthOfSide
+        self.pointsPerCar = pointsPerUnitLength
+        self.pointsPerUnitLength = pointsPerUnitLength
+        self.pointsPerSide = (lengthOfSide * pointsPerUnitLength) + 1  # because both ends are included as points
         self.parkedCars = []
-        self.sizeOfLot = sizeOfLot
+        self.pointsCarCanPark = self.getEverywhereCanParkInitially()
 
-    def generateRandomCarInsideLot(self):
-        pass
+    def getEverywhereCanParkInitially(self):
+        # to be implemented. gets location cars can be placed in starting lot.
+        return []
 
-    def addNewCar(self, newCar):
-        self.parkedSpheres.append(newCar)
+    def generateNewCarThatCanPark(self):
+        newCarLocation = choice(self.pointsCarCanPark)
+        return self.CarClass(newCarLocation, self.pointsPerCar)
 
-    def carCanBeAdded(self, newCar):
-        pass
+    def parkNewCar(self, newCar):
+        self.parkedCars.append(newCar)
+        newUnavailableSpace = self.findNewlyUnavailableSpace(newCar)
+        self.removeFromAvailableSpace(newUnavailableSpace)
 
-    def isJammed(self):
-        return False
+    def findNewlyUnavailableSpace(self, newCar):
+        # To be Implemented
+        return []
 
-    def displayInformation(self):
-        print('Number of Cars: ' + str(len(self.parkedCars)))
-
-class Point:
-    def __init__(self, coordinates, dimension):
-        self.dimension = dimension
-        self.coordinates = coordinates
-
-    def distanceFrom(self, point):
-        return sqrt(
-            sum((self.coordinates[i] - point.coordinates[i]) ** 2 for i in range(self.dimension))
+    def removeFromAvailableSpace(self, newUnavailableSpace):
+        self.pointsCarCanPark = list(
+            filter(lambda point: not point.isInSetOfPoints(newUnavailableSpace), self.pointsCarCanPark)
         )
 
-class Car:
-    def __init__(self, location, size=1):
-        self.location = location
-        self.size = size
+    def display(self):
+        print("Number of Squares: " + str(len(self.parkedCars)))
+        plt.axes()
 
-    def isPointInsideSphere(self, point):
-        return self.center.distanceFrom(point) < self.radius
+        axes = plt.gca()
+        axes.set_xlim([0, self.lengthOfSide])
+        axes.set_ylim([0, self.lengthOfSide])
 
-    def overlapsWithSphere(self, sphere):
-        return self.center.distanceFrom(sphere.center) < self.radius + sphere.radius
+        for car in self.parkedCars:
+            car.displayOntoPlot()
 
-def run1Simulation(dimension):
-    parkingLot = SphereParkingLot.createStandardLotWithDimension(dimension)
-    while not parkingLot.isJammed():
-        print(parkingLot.successfullyAddedHistory)
-        newSphere = parkingLot.generateRandomSphereInsideLot()
-        parkingLot.attemptToAddNewSphere(newSphere)
+        plt.axis('scaled')
+        plt.show()
 
-    parkingLot.displayInformation()
+class TemplateCar(object):
+    def __init__(self):
+        self.colour = self.randomCarColour()
 
-run1Simulation(2)
+    def displayOntoPlot(self):
+        pass
+
+    @staticmethod
+    def randomCarColour():
+        u = randint(0, 64)
+        if u < 19:
+            return 'k'
+        elif u < 35:
+            return '0.6'
+        elif u < 41:
+            return '#C0C0C0'
+        elif u < 49:
+            return 'b'
+        elif u < 59:
+            return 'r'
+        elif u < 62:
+            return 'g'
+        elif u < 63:
+            return 'y'
+        else:
+            return 'm'
+
+class TemplatePoint(object):
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+
+    def isInSetOfPoints(self, setOfPoints):
+        return any([self.equals(point) for point in setOfPoints])
+
+    def equals(self, point):
+        return self.x == point.x and self.y == point.y
+
+
+standardPointsPerUnitLength = 10
+
+def run1SimulationWithLotSize(ParkingLotClass, parkingLotSize, display=False):
+    parkingLot = ParkingLotClass(parkingLotSize, standardPointsPerUnitLength)
+    while parkingLot.pointsCarCanPark:  # False when list is empty i.e. nowhere left to park
+        newCar = parkingLot.generateNewCarThatCanPark()
+        parkingLot.parkNewCar(newCar)
+
+    if display:
+        parkingLot.display()
+
+    return len(parkingLot.parkedCars)
+
+def runManySimulations(ParkingLotClass, parkingLotSize, iterations):
+    numberOfParkedCars = [
+        run1SimulationWithLotSize(ParkingLotClass, parkingLotSize, display=False) for i in range(iterations)
+    ]
+    print(numberOfParkedCars)
