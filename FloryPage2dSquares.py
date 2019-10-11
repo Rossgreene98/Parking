@@ -1,10 +1,12 @@
-from random import choice
+from random import choice, randint
 import matplotlib.pyplot as plt
 
 class SquareParkingLot:
-    def __init__(self, lengthOfSide, pointsPerCar):
-        self.pointsPerSide = lengthOfSide + 1  # because both ends are included as points
-        self.pointsPerCar = pointsPerCar
+    def __init__(self, lengthOfSide, pointsPerUnitLength, lengthOfCar=1):
+        self.lengthOfSide = lengthOfSide
+        self.pointsPerSide = (lengthOfSide * pointsPerUnitLength) + 1  # because both ends are included as points
+        self.pointsPerCar = lengthOfCar * pointsPerUnitLength
+        self.pointsPerUnitLength = pointsPerUnitLength
         self.parkedCars = []
         self.pointsCarCanPark = self.getEverywhereCanParkInitially()
 
@@ -36,34 +38,54 @@ class SquareParkingLot:
             filter(lambda point: not point.isInSetOfPoints(newUnavailableSpace), self.pointsCarCanPark)
         )
 
-    def display(self, withImage=True):
+    def display(self):
         print("Number of Squares: " + str(len(self.parkedCars)))
-        if withImage:
-            plt.axes()
+        plt.axes()
 
-            axes = plt.gca()
-            axes.set_xlim([0, self.pointsPerSide])
-            axes.set_ylim([0, self.pointsPerSide])
+        axes = plt.gca()
+        axes.set_xlim([0, self.lengthOfSide])
+        axes.set_ylim([0, self.lengthOfSide])
 
-            for car in self.parkedCars:
-                car.displayOntoPlot()
+        for car in self.parkedCars:
+            car.displayOntoPlot()
 
-            plt.axis('scaled')
-            plt.show()
+        plt.axis('scaled')
+        plt.show()
 
 class Car:
-    def __init__(self, bottomLeftPoint, pointsPerCar):
+    def __init__(self, bottomLeftPoint, pointsPerCar, lengthOfCar=1):
+        self.lengthOfCar = lengthOfCar
         self.bottomLeftPoint = bottomLeftPoint
         self.pointsPerCar = pointsPerCar
 
     def displayOntoPlot(self):
         rectangle = plt.Rectangle(
-            (self.bottomLeftPoint.x, self.bottomLeftPoint.y),
-            self.pointsPerCar,
-            self.pointsPerCar,
-            fc='r'
+            (self.bottomLeftPoint.x / self.pointsPerCar, self.bottomLeftPoint.y / self.pointsPerCar),
+            self.lengthOfCar,
+            self.lengthOfCar,
+            fc=self.randomCarColour()
         )
         plt.gca().add_patch(rectangle)
+
+    @staticmethod
+    def randomCarColour():
+        u = randint(0, 64)
+        if u < 19:
+            return 'k'
+        elif u < 35:
+            return '0.6'
+        elif u < 41:
+            return '#C0C0C0'
+        elif u < 49:
+            return 'b'
+        elif u < 59:
+            return 'r'
+        elif u < 62:
+            return 'g'
+        elif u < 63:
+            return 'y'
+        else:
+            return 'm'
 
 
 class Point:
@@ -78,19 +100,26 @@ class Point:
     def equals(self, point):
         return self.x == point.x and self.y == point.y
 
-def createParkingLotWithSize1Cars(sizeOfLot, meshSize=0.01):
-    return SquareParkingLot(int(sizeOfLot / meshSize), int(1 / meshSize))
 
+standardPointsPerUnitLength = 10
 
-# Mesh Size is smallest possible distance separating parked cars. All cars placed on intersection of Mesh
-standardMeshSize = 0.1
-
-def run1SimulationWithLotSize(parkingLotSize):
-    parkingLot = createParkingLotWithSize1Cars(parkingLotSize, standardMeshSize)
+def run1SimulationWithLotSize(parkingLotSize, display=False):
+    parkingLot = SquareParkingLot(parkingLotSize, standardPointsPerUnitLength, 1)
     while parkingLot.pointsCarCanPark:  # False when list is empty i.e. nowhere left to park
         newCar = parkingLot.generateNewCarThatCanPark()
         parkingLot.parkNewCar(newCar)
-    parkingLot.display()
+
+    if display:
+        parkingLot.display()
+
+    return len(parkingLot.parkedCars)
+
+def runManySimulations(parkingLotSize, iterations):
+    numberOfParkedCars = [
+        run1SimulationWithLotSize(parkingLotSize, display=False) in range(iterations)
+    ]
+    print(numberOfParkedCars)
 
 
-run1SimulationWithLotSize(10)
+run1SimulationWithLotSize(10, display=True)
+# runManySimulations(10, 10)
