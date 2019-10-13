@@ -21,16 +21,11 @@ class TemplateParkingLot(object):
 
     def parkNewCar(self, newCar):
         self.parkedCars.append(newCar)
-        newUnavailableSpace = self.findNewlyUnavailableSpace(newCar)
-        self.removeFromAvailableSpace(newUnavailableSpace)
+        self.removeNewlyUnavailableSpace(newCar)
 
-    def findNewlyUnavailableSpace(self, newCar):
-        # To be Implemented
-        return []
-
-    def removeFromAvailableSpace(self, newUnavailableSpace):
+    def removeNewlyUnavailableSpace(self, newCar):
         self.pointsCarCanPark = list(
-            filter(lambda point: not point.isInSetOfPoints(newUnavailableSpace), self.pointsCarCanPark)
+            filter(lambda point: not newCar.stopsPointBeingParkedIn(point), self.pointsCarCanPark)
         )
 
     def display(self):
@@ -50,6 +45,10 @@ class TemplateParkingLot(object):
 class TemplateCar(object):
     def __init__(self):
         self.colour = self.randomCarColour()
+
+    def stopsPointBeingParkedIn(self, point):
+        # to be implemented. Returns true if a car parked in 'point' would overlap with self
+        pass
 
     def displayOntoPlot(self):
         pass
@@ -78,12 +77,6 @@ class TemplatePoint(object):
     def __init__(self, x, y):
         self.x = x
         self.y = y
-
-    def isInSetOfPoints(self, setOfPoints):
-        return any([self.equals(point) for point in setOfPoints])
-
-    def equals(self, point):
-        return self.x == point.x and self.y == point.y
 
 
 standardPointsPerUnitLength = 10

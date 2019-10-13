@@ -3,8 +3,8 @@ import ParkingTemplate
 
 class SquareParkingLot(ParkingTemplate.TemplateParkingLot):
     def __init__(self, lengthOfSide, pointsPerUnitLength):
-        self.pointsPerCar = pointsPerUnitLength  # Since all cars have length 1
-        super(SquareParkingLot, self).__init__(lengthOfSide, pointsPerUnitLength, SquareCar)
+        self.carRadius = pointsPerUnitLength / 2  # Since cars have diameter 1
+        super(SquareParkingLot, self).__init__(lengthOfSide, pointsPerUnitLength, CircleCar)
 
     def getEverywhereCanParkInitially(self):
         allPlacesForNewCar = []
@@ -12,15 +12,19 @@ class SquareParkingLot(ParkingTemplate.TemplateParkingLot):
             allPlacesForNewCar += [Point(i, j) for j in range(self.pointsPerSide - self.pointsPerCar)]
         return allPlacesForNewCar
 
+    def findNewlyUnavailableSpace(self, newCar):
+        newCarLocation = newCar.bottomLeftPoint
+        newUnavailableSpace = []
+        for i in range(newCarLocation.x - self.pointsPerCar, newCarLocation.x + self.pointsPerCar + 1):
+            for j in range(newCarLocation.y - self.pointsPerCar, newCarLocation.y + self.pointsPerCar + 1):
+                newUnavailableSpace.append(Point(i, j))
+        return newUnavailableSpace
+
 class SquareCar(ParkingTemplate.TemplateCar):
     def __init__(self, bottomLeftPoint, pointsPerCar):
         super().__init__()
         self.bottomLeftPoint = bottomLeftPoint
         self.pointsPerCar = pointsPerCar
-
-    def stopsPointBeingParkedIn(self, point):
-        return abs(self.bottomLeftPoint.x - point.x) <= self.pointsPerCar and\
-               abs(self.bottomLeftPoint.y - point.y) <= self.pointsPerCar
 
     def displayOntoPlot(self):
         rectangle = plt.Rectangle(
@@ -35,5 +39,5 @@ class Point(ParkingTemplate.TemplatePoint):
     pass
 
 
-ParkingTemplate.run1SimulationWithLotSize(SquareParkingLot, 10, display=True)
-# ParkingTemplate.runManySimulations(SquareParkingLot, 10, 10)
+# ParkingTemplate.run1SimulationWithLotSize(SquareParkingLot, 10, display=True)
+ParkingTemplate.runManySimulations(SquareParkingLot, 10, 10)
