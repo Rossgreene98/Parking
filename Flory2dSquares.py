@@ -36,4 +36,4 @@ class Point(ParkingTemplate.TemplatePoint):
 
 
 ParkingTemplate.run1SimulationWithLotSize(SquareParkingLot, 10, display=True)
-# ParkingTemplate.runManySimulations(SquareParkingLot, 10, 10)
+# ParkingTemplate.runManySimulations(SquareParkingLot, 10, 50)

@@ -29,7 +29,7 @@ class TemplateParkingLot(object):
         )
 
     def display(self):
-        print("Number of Squares: " + str(len(self.parkedCars)))
+        print("Number of Cars: " + str(len(self.parkedCars)))
         plt.axes()
 
         axes = plt.gca()
@@ -79,7 +79,7 @@ class TemplatePoint(object):
         self.y = y
 
 
-standardPointsPerUnitLength = 10
+standardPointsPerUnitLength = 20
 
 def run1SimulationWithLotSize(ParkingLotClass, parkingLotSize, display=False):
     parkingLot = ParkingLotClass(parkingLotSize, standardPointsPerUnitLength)

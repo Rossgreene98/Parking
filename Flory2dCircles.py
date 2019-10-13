@@ -1,43 +1,45 @@
+from math import sqrt
+
 import matplotlib.pyplot as plt
 import ParkingTemplate
 
-class SquareParkingLot(ParkingTemplate.TemplateParkingLot):
+class CircleParkingLot(ParkingTemplate.TemplateParkingLot):
     def __init__(self, lengthOfSide, pointsPerUnitLength):
-        self.carRadius = pointsPerUnitLength / 2  # Since cars have diameter 1
-        super(SquareParkingLot, self).__init__(lengthOfSide, pointsPerUnitLength, CircleCar)
+        self.pointsAlongCarRadius = int(pointsPerUnitLength / 2)  # Since all cars have diameter 1
+        super().__init__(lengthOfSide, pointsPerUnitLength, CircularCar)
 
     def getEverywhereCanParkInitially(self):
-        allPlacesForNewCar = []
-        for i in range(self.pointsPerSide - self.pointsPerCar):
-            allPlacesForNewCar += [Point(i, j) for j in range(self.pointsPerSide - self.pointsPerCar)]
-        return allPlacesForNewCar
+        r = range(self.pointsAlongCarRadius, self.pointsPerSide - self.pointsAlongCarRadius)
+        return [
+            Point(i, j) for i in r for j in r
+        ]
 
-    def findNewlyUnavailableSpace(self, newCar):
-        newCarLocation = newCar.bottomLeftPoint
-        newUnavailableSpace = []
-        for i in range(newCarLocation.x - self.pointsPerCar, newCarLocation.x + self.pointsPerCar + 1):
-            for j in range(newCarLocation.y - self.pointsPerCar, newCarLocation.y + self.pointsPerCar + 1):
-                newUnavailableSpace.append(Point(i, j))
-        return newUnavailableSpace
-
-class SquareCar(ParkingTemplate.TemplateCar):
-    def __init__(self, bottomLeftPoint, pointsPerCar):
+class CircularCar(ParkingTemplate.TemplateCar):
+    def __init__(self, centrePoint, pointsAlongDiameter):
+        self.centrePoint = centrePoint
+        self.pointsAlongRadius = int(pointsAlongDiameter / 2)
+        self.pointsPerUnitLength = pointsAlongDiameter
         super().__init__()
-        self.bottomLeftPoint = bottomLeftPoint
-        self.pointsPerCar = pointsPerCar
+
+    def stopsPointBeingParkedIn(self, point):
+        # Since circles only overlap if their centres are separated by less than 2 radii
+        return self.centrePoint.distanceTo(point) <= self.pointsAlongRadius * 2
 
     def displayOntoPlot(self):
-        rectangle = plt.Rectangle(
-            (self.bottomLeftPoint.x / self.pointsPerCar, self.bottomLeftPoint.y / self.pointsPerCar),
-            1,
-            1,
+        rectangle = plt.Circle(
+            (self.centrePoint.x / self.pointsPerUnitLength, self.centrePoint.y / self.pointsPerUnitLength),
+            self.pointsAlongRadius / self.pointsPerUnitLength,
             fc=self.colour
         )
         plt.gca().add_patch(rectangle)
 
 class Point(ParkingTemplate.TemplatePoint):
-    pass
+    def __init__(self, x, y):
+        super().__init__(x, y)
+
+    def distanceTo(self, point):
+        return sqrt((self.x - point.x)**2 + (self.y - point.y)**2)
 
 
-# ParkingTemplate.run1SimulationWithLotSize(SquareParkingLot, 10, display=True)
-ParkingTemplate.runManySimulations(SquareParkingLot, 10, 10)
+ParkingTemplate.run1SimulationWithLotSize(CircleParkingLot, 10, display=True)
+# ParkingTemplate.runManySimulations(CircleParkingLot, 10, 50)
