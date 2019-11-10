@@ -40,6 +40,8 @@ class Point(ParkingTemplate.TemplatePoint):
     def distanceTo(self, point):
         return sqrt((self.x - point.x)**2 + (self.y - point.y)**2)
 
+def simulateManyCircles():
+    return ParkingTemplate.runManySimulations(CircleParkingLot)
 
-ParkingTemplate.run1SimulationWithLotSize(CircleParkingLot, 10, display=True)
-# ParkingTemplate.runManySimulations(CircleParkingLot, 10, 50)
+# ParkingTemplate.run1Simulation(CircleParkingLot, 10, display=True)
+print(simulateManyCircles())
