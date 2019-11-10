@@ -42,6 +42,11 @@ class TemplateParkingLot(object):
         plt.axis('scaled')
         plt.show()
 
+    def reset(self):
+        self.parkedCars = []
+        self.pointsCarCanPark = self.getEverywhereCanParkInitially()
+
+
 class TemplateCar(object):
     def __init__(self):
         self.colour = self.randomCarColour()
@@ -82,28 +87,33 @@ standardPointsPerUnitLength = 10
 standardParkingLotSize = 10
 standardNumberOfIterations = 100
 
-def run1Simulation(ParkingLotClass, parkingLotSize, meshDensity=standardPointsPerUnitLength, display=False):
-    parkingLot = ParkingLotClass(parkingLotSize, meshDensity)
-    while parkingLot.pointsCarCanPark:  # False when list is empty i.e. nowhere left to park
-        newCar = parkingLot.generateNewCarThatCanPark()
-        parkingLot.parkNewCar(newCar)
-
-    if display:
-        parkingLot.display()
-
-    return len(parkingLot.parkedCars)
-
-def runManySimulations(
-        ParkingLotClass,
-        parkingLotSize=standardParkingLotSize,
-        iterations=standardNumberOfIterations,
-        meshDensity=standardPointsPerUnitLength
-):
-    return [
-        run1Simulation(
+class TemplateSimulation:
+    def __init__(
+            self,
             ParkingLotClass,
-            parkingLotSize,
-            meshDensity,
+            parkingLotSize=standardParkingLotSize,
+            meshDensity=standardPointsPerUnitLength,
             display=False
-        ) for i in range(iterations)
-    ]
+    ):
+        self.parkingLot = ParkingLotClass(parkingLotSize, meshDensity)
+        self.display = display
+
+    def reset(self):
+        self.parkingLot.reset()
+
+    def simulate(self):
+        while self.parkingLot.pointsCarCanPark:  # False when list is empty i.e. nowhere left to park
+            newCar = self.parkingLot.generateNewCarThatCanPark()
+            self.parkingLot.parkNewCar(newCar)
+
+        if self.display:
+            self.parkingLot.display()
+
+        return len(self.parkingLot.parkedCars)
+
+    def nSimulations(self, n=standardNumberOfIterations):
+        numberOfParkedCars = []
+        for i in range(n):
+            self.reset()
+            numberOfParkedCars.append(self.simulate())
+        return numberOfParkedCars
