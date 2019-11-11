@@ -34,6 +34,8 @@ class SquareCar(ParkingTemplate.TemplateCar):
 class Point(ParkingTemplate.TemplatePoint):
     pass
 
+def simulateManySquares():
+    return ParkingTemplate.TemplateSimulation(SquareParkingLot).nSimulations()
 
-ParkingTemplate.run1Simulation(SquareParkingLot, 10, display=True)
-# ParkingTemplate.runManySimulations(SquareParkingLot, 10, 50)
+ParkingTemplate.TemplateSimulation(SquareParkingLot).simulate(display=True)
+simulateManySquares()

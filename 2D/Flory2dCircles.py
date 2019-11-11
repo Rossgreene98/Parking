@@ -41,7 +41,7 @@ class Point(ParkingTemplate.TemplatePoint):
         return sqrt((self.x - point.x)**2 + (self.y - point.y)**2)
 
 def simulateManyCircles():
-    return ParkingTemplate.runManySimulations(CircleParkingLot)
+    return ParkingTemplate.TemplateSimulation(CircleParkingLot).nSimulations()
 
-# ParkingTemplate.run1Simulation(CircleParkingLot, 10, display=True)
+ParkingTemplate.TemplateSimulation(CircleParkingLot).simulate(display=True)
 print(simulateManyCircles())

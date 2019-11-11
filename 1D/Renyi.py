@@ -1,9 +1,9 @@
 from random import uniform
 
-def numberOfCarsOnCurb(length):
-    if length < 1:
+def renyi(x):
+    if x < 1:
         return 0
-    u = uniform(0, length - 1)
-    return 1 + numberOfCarsOnCurb(u) + numberOfCarsOnCurb(length - 1 - u)
+    u = uniform(0, x - 1)
+    return 1 + renyi(u) + renyi(x - 1 - u)
 
-print(numberOfCarsOnCurb(100))
+print([renyi(100) for i in range(100)])

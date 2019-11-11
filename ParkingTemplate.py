@@ -56,6 +56,7 @@ class TemplateCar(object):
         pass
 
     def displayOntoPlot(self):
+        # to be implemented. Displays car onto matplotlib plot
         pass
 
     @staticmethod
@@ -93,20 +94,18 @@ class TemplateSimulation:
             ParkingLotClass,
             parkingLotSize=standardParkingLotSize,
             meshDensity=standardPointsPerUnitLength,
-            display=False
     ):
         self.parkingLot = ParkingLotClass(parkingLotSize, meshDensity)
-        self.display = display
 
     def reset(self):
         self.parkingLot.reset()
 
-    def simulate(self):
+    def simulate(self, display=False):
         while self.parkingLot.pointsCarCanPark:  # False when list is empty i.e. nowhere left to park
             newCar = self.parkingLot.generateNewCarThatCanPark()
             self.parkingLot.parkNewCar(newCar)
 
-        if self.display:
+        if display:
             self.parkingLot.display()
 
         return len(self.parkingLot.parkedCars)
@@ -117,3 +116,5 @@ class TemplateSimulation:
             self.reset()
             numberOfParkedCars.append(self.simulate())
         return numberOfParkedCars
+
+
