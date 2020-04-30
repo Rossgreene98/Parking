@@ -1,0 +1,12 @@
+This folder is divided into folders: OneDimension, Flory2D and Renyi2D.
+In each folder is the code used to run simulations, the data produced (in .txt),
+the code used to process the data, and the graphs produced.
+
+In 'OneDimension', 'Renyi' and 'SimpleFlory' do the bulk of the processing, and are referenced in
+chapters 2 and 4 respectively.
+
+For Flory2D, 'ParkingTemplate.py', located outside the folder, assists Flory2dCircles and Flory2dSquares,
+neither are referenced in the report, though they produce images for presentation and report.
+The actual code referenced is in Flory2D.
+
+For Renyi2D, the primary code is written in the file of the same name.

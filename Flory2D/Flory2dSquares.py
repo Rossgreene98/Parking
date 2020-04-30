@@ -1,19 +1,18 @@
 import matplotlib.pyplot as plt
 import ParkingTemplate
 
-class LorryParkingLot(ParkingTemplate.TemplateParkingLot):
-    def __init__(self, lengthOfSide, pointsPerUnitLength, lorryProbability):
+class SquareParkingLot(ParkingTemplate.TemplateParkingLot):
+    def __init__(self, lengthOfSide, pointsPerUnitLength):
         self.pointsPerCar = pointsPerUnitLength  # Since all cars have length 1
-        self.p = lorryProbability
-        super(LorryParkingLot, self).__init__(lengthOfSide, pointsPerUnitLength, LorryOrCar)
+        super(SquareParkingLot, self).__init__(lengthOfSide, pointsPerUnitLength, SquareCar)
 
     def getEverywhereCanParkInitially(self):
         allPlacesForNewCar = []
         for i in range(self.pointsPerSide - self.pointsPerCar):
-            allPlacesForNewCar += [Point(i, j, Car) for j in range(self.pointsPerSide - self.pointsPerCar)]
+            allPlacesForNewCar += [Point(i, j) for j in range(self.pointsPerSide - self.pointsPerCar)]
         return allPlacesForNewCar
 
-class LorryOrCar(ParkingTemplate.TemplateCar):
+class SquareCar(ParkingTemplate.TemplateCar):
     def __init__(self, bottomLeftPoint, pointsPerCar):
         super().__init__()
         self.bottomLeftPoint = bottomLeftPoint
@@ -39,4 +38,13 @@ def simulateManySquares():
     return ParkingTemplate.TemplateSimulation(SquareParkingLot).nSimulations()
 
 ParkingTemplate.TemplateSimulation(SquareParkingLot).simulate(display=True)
-simulateManySquares()
+
+font = {'family': 'serif',
+        'color':  'darkred',
+        'weight': 'normal',
+        'size': 24,
+        }
+
+plt.title('k=100', fontdict=font)
+plt.show()
+#  simulateManySquares()

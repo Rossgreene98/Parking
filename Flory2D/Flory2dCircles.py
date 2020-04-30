@@ -1,4 +1,11 @@
 from math import sqrt
+import time
+
+"""
+This code works in conjunction with ParkingTemplate to produce the same effect as Flory2D.py. 
+Although this is not the code used to run simulations, it was used to create images used in the dissertation,
+since the function Flory2D did not have this functionality.
+"""
 
 import matplotlib.pyplot as plt
 import ParkingTemplate
@@ -26,12 +33,12 @@ class CircularCar(ParkingTemplate.TemplateCar):
         return self.centrePoint.distanceTo(point) <= self.pointsAlongRadius * 2
 
     def displayOntoPlot(self):
-        rectangle = plt.Circle(
+        circle = plt.Circle(
             (self.centrePoint.x / self.pointsPerUnitLength, self.centrePoint.y / self.pointsPerUnitLength),
             self.pointsAlongRadius / self.pointsPerUnitLength,
             fc=self.colour
         )
-        plt.gca().add_patch(rectangle)
+        plt.gca().add_patch(circle)
 
 class Point(ParkingTemplate.TemplatePoint):
     def __init__(self, x, y):
@@ -43,5 +50,15 @@ class Point(ParkingTemplate.TemplatePoint):
 def simulateManyCircles():
     return ParkingTemplate.TemplateSimulation(CircleParkingLot).nSimulations()
 
+def timeSimulation():
+    start_time = time.time()
+    ParkingTemplate.TemplateSimulation(CircleParkingLot).simulate()
+    print("--- %s seconds ---" % (time.time() - start_time))
+    # Printed 18.69 for x=10, k=100
+
+timeSimulation()
+
 ParkingTemplate.TemplateSimulation(CircleParkingLot).simulate(display=True)
-print(simulateManyCircles())
+plt.title('Flory2D Flory, k=100')
+plt.show()
+# print(simulateManyCircles())

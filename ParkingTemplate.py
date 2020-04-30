@@ -1,6 +1,10 @@
 from random import choice, randint
 import matplotlib.pyplot as plt
 
+""" 
+This code runs in conjunction with Flory2dCircles, there is more information about its purpose at the top of that file.
+"""
+
 class TemplateParkingLot(object):
     def __init__(self, lengthOfSide, pointsPerUnitLength, CarClass):
         self.CarClass = CarClass
@@ -12,7 +16,7 @@ class TemplateParkingLot(object):
         self.pointsCarCanPark = self.getEverywhereCanParkInitially()
 
     def getEverywhereCanParkInitially(self):
-        # to be implemented. gets location cars can be placed in starting lot.
+        # to be implemented in e.g. Flory2dCircles. gets location cars can be placed in starting lot.
         return []
 
     def generateNewCarThatCanPark(self):
@@ -28,19 +32,39 @@ class TemplateParkingLot(object):
             filter(lambda point: not newCar.stopsPointBeingParkedIn(point), self.pointsCarCanPark)
         )
 
-    def display(self):
+    def display(self, grid=False, border=True):
         print("Number of Cars: " + str(len(self.parkedCars)))
         plt.axes()
 
-        axes = plt.gca()
-        axes.set_xlim([0, self.lengthOfSide])
-        axes.set_ylim([0, self.lengthOfSide])
+        plt.xlim([0, self.lengthOfSide])
+        plt.xlim([0, self.lengthOfSide])
+
+        # axes = plt.gca()
+        #
+        # axes.set_xlim([0, self.lengthOfSide])
+        # axes.set_ylim([0, self.lengthOfSide])
 
         for car in self.parkedCars:
             car.displayOntoPlot()
 
+        if grid:
+            for i in range(self.pointsPerSide):
+                plt.axhline(i / self.pointsPerCar, xmin=0.05, xmax=0.95, alpha=0.4)
+                plt.axvline(i / self.pointsPerCar, ymin=0.05, ymax=0.95, alpha=0.4)
+
+        if border:
+            plt.plot([0, 0], [self.lengthOfSide, 0], color='blue')
+            plt.plot([0, self.lengthOfSide], [self.lengthOfSide, self.lengthOfSide], color='blue')
+            plt.plot([self.lengthOfSide, self.lengthOfSide], [0, self.lengthOfSide], color='blue')
+            plt.plot([self.lengthOfSide, 0], [0, 0], color='blue')
+
+        font = {'family': 'serif',
+                'color': 'darkred',
+                'weight': 'normal',
+                'size': 24,
+                }
+
         plt.axis('scaled')
-        plt.show()
 
     def reset(self):
         self.parkedCars = []
@@ -84,7 +108,9 @@ class TemplatePoint(object):
         self.x = x
         self.y = y
 
-standardPointsPerUnitLength = 10
+# Change these parameters to change all simulations run through template
+k = 100
+
 standardParkingLotSize = 10
 standardNumberOfIterations = 100
 
@@ -93,7 +119,7 @@ class TemplateSimulation:
             self,
             ParkingLotClass,
             parkingLotSize=standardParkingLotSize,
-            meshDensity=standardPointsPerUnitLength,
+            meshDensity=k,
     ):
         self.parkingLot = ParkingLotClass(parkingLotSize, meshDensity)
 
@@ -116,5 +142,3 @@ class TemplateSimulation:
             self.reset()
             numberOfParkedCars.append(self.simulate())
         return numberOfParkedCars
-
-
